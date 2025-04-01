@@ -8,17 +8,26 @@ async function scrapePowerBI(countryCode, hsCode, hsLevel, signal) {
         hsCode = hsCode.slice(0, -1);
     }
 
+    console.log("Checking if cache directory exists...");
+const cacheDir = '/opt/render/.cache/puppeteer';
+fs.access(cacheDir, fs.constants.F_OK, (err) => {
+    if (err) {
+        console.error(`Cache directory does not exist: ${cacheDir}`);
+    } else {
+        console.log(`Cache directory exists: ${cacheDir}`);
+    }
+});
+
     console.log(puppeteer.executablePath());
 
     try {
-        console.log("Launching Puppeteer with executable path:", puppeteer.executablePath());
+        console.log("Launching Puppeteer...", puppeteer.executablePath());
         const browser = await puppeteer.launch({
             headless: "new",
-            executablePath: '/opt/render/.cache/puppeteer/chrome/linux-134.0.6998.35/chrome-linux64/chrome', // Path to chrome
+            executablePath: puppeteer.executablePath(),
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
-            timeout: 60000
         });
-        console.log("Puppeteer launched successfully");
+        console.log("Puppeteer launched successfully.");
     } catch (error) {
         console.error("Error launching Puppeteer:", error);
     }
