@@ -29,6 +29,10 @@ async function scrapePowerBI(countryCode, hsCode, hsLevel, signal) {
             executablePath: executablePath,
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
         });
+    } catch (error) {
+        console.error("Error during scraping:", error);
+        return { error: `Scraping failed: ${error.message}` };
+    }
 
     console.log(puppeteer.executablePath());
 
