@@ -37,7 +37,7 @@ app.post("/scrape/:country/:hsCode/:hsLevel", async (req, res) => {
         if (error.name === 'AbortError') {
             res.status(499).json({ error: "Request cancelled" });
         } else {
-            res.status(500).json({ error: "Scraping failed" });
+            res.status(500).json({ error: `Scraping failed: ${error.message}` });
         }
     } finally {
         activeOperations.delete(operationId);
