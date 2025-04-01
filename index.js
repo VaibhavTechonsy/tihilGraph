@@ -8,15 +8,26 @@ async function scrapePowerBI(countryCode, hsCode, hsLevel, signal) {
         hsCode = hsCode.slice(0, -1);
     }
 
-    console.log("Checking if cache directory exists...");
-const cacheDir = '/opt/render/.cache/puppeteer';
-fs.access(cacheDir, fs.constants.F_OK, (err) => {
-    if (err) {
-        console.error(`Cache directory does not exist: ${cacheDir}`);
-    } else {
-        console.log(`Cache directory exists: ${cacheDir}`);
-    }
-});
+    const executablePath = puppeteer.executablePath();
+        console.log("Puppeteer executable path:", executablePath);
+
+        // Check if the browser exists at the executable path
+        fs.access(executablePath, fs.constants.F_OK, (err) => {
+            if (err) {
+                console.error(`Browser not found at path: ${executablePath}`);
+            } else {
+                console.log(`Browser found at path: ${executablePath}`);
+            }
+        });
+
+        // Check if the cache directory exists
+        fs.access('/opt/render/.cache/puppeteer', fs.constants.F_OK, (err) => {
+            if (err) {
+                console.error(`Cache directory does not exist: /opt/render/.cache/puppeteer`);
+            } else {
+                console.log(`Cache directory exists: /opt/render/.cache/puppeteer`);
+            }
+        });
 
     console.log(puppeteer.executablePath());
 
