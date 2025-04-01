@@ -12,7 +12,7 @@ async function scrapePowerBI(countryCode, hsCode, hsLevel, signal) {
 
     const browser = await puppeteer.launch({ 
         headless: "new",
-        executablePath: puppeteer.executablePath(),
+        executablePath: '/opt/render/.cache/puppeteer/chrome/linux-134.0.6998.35/chrome-linux64/chrome',
         args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     const page = await browser.newPage();
