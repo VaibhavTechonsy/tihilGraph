@@ -9,7 +9,8 @@ async function scrapePowerBI(countryCode, hsCode, hsLevel, signal) {
     }
 
     const browser = await puppeteer.launch({ 
-        headless: true,
+        headless: "new",
+        executablePath: puppeteer.executablePath(),
         args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     const page = await browser.newPage();
