@@ -11,6 +11,6 @@
   "scripts": {
   "start": "node index.js",
   "build": "echo 'No build step required'",
-  "postinstall": "npx puppeteer browsers install chrome"
+  "postinstall": "echo 'Installing Puppeteer browser...' && npx puppeteer browsers install chrome"
   }
 }
