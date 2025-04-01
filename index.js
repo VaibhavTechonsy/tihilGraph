@@ -8,22 +8,33 @@ async function scrapePowerBI(countryCode, hsCode, hsLevel, signal) {
         hsCode = hsCode.slice(0, -1);
     }
 
-    let browser;
-    let page;
-    
-    // Set executable path for Render
-    const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || 
-                         '/opt/render/.cache/puppeteer/chrome/linux-134.0.6998.35/chrome-linux64/chrome';
+    let browser = null;
 
     try {
-        // Verify Chrome exists
-        if (!fs.existsSync(executablePath)) {
-            console.error(`Chrome not found at: ${executablePath}`);
-            return { error: `Chrome not found at configured path` };
+        // Try different possible Chrome paths
+        const possiblePaths = [
+            process.env.PUPPETEER_EXECUTABLE_PATH,
+            '/usr/bin/google-chrome',
+            '/usr/bin/chromium',
+            '/usr/bin/chromium-browser',
+            '/opt/render/.cache/puppeteer/chrome/linux-134.0.6998.35/chrome-linux64/chrome',
+            puppeteer.executablePath()
+        ];
+
+        let executablePath;
+        for (const path of possiblePaths) {
+            if (path && fs.existsSync(path)) {
+                executablePath = path;
+                break;
+            }
         }
 
-        console.log(`Launching browser at: ${executablePath}`);
-        
+        if (!executablePath) {
+            throw new Error('Could not find Chrome/Chromium executable at any known location');
+        }
+
+        console.log(`Using Chrome at: ${executablePath}`);
+
         browser = await puppeteer.launch({
             headless: "new",
             executablePath: executablePath,
@@ -31,18 +42,23 @@ async function scrapePowerBI(countryCode, hsCode, hsLevel, signal) {
                 '--no-sandbox',
                 '--disable-setuid-sandbox',
                 '--disable-dev-shm-usage',
-                '--disable-accelerated-2d-canvas',
-                '--no-first-run',
-                '--no-zygote',
                 '--single-process',
-                '--disable-gpu'
+                '--no-zygote'
             ],
-            timeout: 60000
+            timeout: 30000
         });
 
-        page = await browser.newPage();
+        const page = await browser.newPage();
         await page.setDefaultNavigationTimeout(120000);
         await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+
+        // Rest of your scraping logic here...
+        // [Keep your existing scraping code]
+
+    } catch (error) {
+        console.error("Scraping error:", error);
+        return { error: `Scraping failed: ${error.message}` };
+    }
 
         const checkCancellation = () => {
             if (signal.aborted) {
