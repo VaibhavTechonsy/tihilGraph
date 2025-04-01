@@ -8,52 +8,39 @@ async function scrapePowerBI(countryCode, hsCode, hsLevel, signal) {
         hsCode = hsCode.slice(0, -1);
     }
 
-    let browser;  // Declare browser at the start
+    let browser;
+    let page;
+    
+    // Set executable path for Render
+    const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || 
+                         '/opt/render/.cache/puppeteer/chrome/linux-134.0.6998.35/chrome-linux64/chrome';
 
     try {
-        const executablePath = puppeteer.executablePath();
-        console.log("Puppeteer executable path:", executablePath);
+        // Verify Chrome exists
+        if (!fs.existsSync(executablePath)) {
+            console.error(`Chrome not found at: ${executablePath}`);
+            return { error: `Chrome not found at configured path` };
+        }
 
-        // Check if the browser exists at the executable path
-        fs.access(executablePath, fs.constants.F_OK, (err) => {
-            if (err) {
-                console.error(`Browser not found at path: ${executablePath}`);
-            } else {
-                console.log(`Browser found at path: ${executablePath}`);
-            }
-        });
-
-        // Launch the browser
+        console.log(`Launching browser at: ${executablePath}`);
+        
         browser = await puppeteer.launch({
             headless: "new",
             executablePath: executablePath,
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-accelerated-2d-canvas',
+                '--no-first-run',
+                '--no-zygote',
+                '--single-process',
+                '--disable-gpu'
+            ],
+            timeout: 60000
         });
-    } catch (error) {
-        console.error("Error during scraping:", error);
-        return { error: `Scraping failed: ${error.message}` };
-    }
 
-    console.log(puppeteer.executablePath());
-
-    try {
-        console.log("Launching Puppeteer...", puppeteer.executablePath());
-        const browser = await puppeteer.launch({
-            headless: "new",
-            executablePath: puppeteer.executablePath(),
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        });
-        console.log("Puppeteer launched successfully.");
-    } catch (error) {
-        console.error("Error launching Puppeteer:", error);
-    }
-    const page = await browser.newPage();
-
-    try {
-        if (signal.aborted) {
-            throw new Error('Operation cancelled');
-        }
-
+        page = await browser.newPage();
         await page.setDefaultNavigationTimeout(120000);
         await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
 
