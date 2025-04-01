@@ -8,6 +8,8 @@ async function scrapePowerBI(countryCode, hsCode, hsLevel, signal) {
         hsCode = hsCode.slice(0, -1);
     }
 
+    console.log(puppeteer.executablePath());
+
     const browser = await puppeteer.launch({ 
         headless: "new",
         executablePath: puppeteer.executablePath(),
