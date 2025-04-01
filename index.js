@@ -10,11 +10,18 @@ async function scrapePowerBI(countryCode, hsCode, hsLevel, signal) {
 
     console.log(puppeteer.executablePath());
 
-    const browser = await puppeteer.launch({ 
-        headless: "new",
-        executablePath: '/opt/render/.cache/puppeteer/chrome/linux-134.0.6998.35/chrome-linux64/chrome',
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
+    try {
+        console.log("Launching Puppeteer with executable path:", puppeteer.executablePath());
+        const browser = await puppeteer.launch({
+            headless: "new",
+            executablePath: '/opt/render/.cache/puppeteer/chrome/linux-134.0.6998.35/chrome-linux64/chrome', // Path to chrome
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            timeout: 60000
+        });
+        console.log("Puppeteer launched successfully");
+    } catch (error) {
+        console.error("Error launching Puppeteer:", error);
+    }
     const page = await browser.newPage();
 
     try {
