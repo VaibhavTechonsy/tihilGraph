@@ -9,7 +9,8 @@
     "puppeteer": "^24.4.0"
   },
   "scripts": {
-    "start": "node server.js",
-    "build": "echo 'No build step required'"
+  "start": "node index.js",
+  "build": "echo 'No build step required'",
+  "postinstall": "npx puppeteer browsers install chrome"
   }
 }
