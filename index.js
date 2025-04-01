@@ -52,14 +52,6 @@ async function scrapePowerBI(countryCode, hsCode, hsLevel, signal) {
         await page.setDefaultNavigationTimeout(120000);
         await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
 
-        // Rest of your scraping logic here...
-        // [Keep your existing scraping code]
-
-    } catch (error) {
-        console.error("Scraping error:", error);
-        return { error: `Scraping failed: ${error.message}` };
-    }
-
         const checkCancellation = () => {
             if (signal.aborted) {
                 throw new Error('Operation cancelled');
@@ -173,9 +165,9 @@ async function scrapePowerBI(countryCode, hsCode, hsLevel, signal) {
                     }
                 });
 
-                
             } catch (error) {
                 if (error.message === 'Operation cancelled') throw error;
+                console.error(`Error processing year ${year}:`, error);
             }
 
             checkCancellation();
@@ -201,12 +193,21 @@ async function scrapePowerBI(countryCode, hsCode, hsLevel, signal) {
 
         fs.writeFileSync(filePath, JSON.stringify(finalData, null, 2));
 
-        return filePath;
+        return {
+            message: "Scraping completed successfully",
+            filePath: filePath
+        };
 
     } catch (error) {
-        throw error;
+        console.error("Scraping error:", error);
+        return { 
+            error: `Scraping failed: ${error.message}`,
+            details: error.stack 
+        };
     } finally {
-        await browser.close();
+        if (browser) {
+            await browser.close().catch(e => console.error("Error closing browser:", e));
+        }
     }
 }
 
